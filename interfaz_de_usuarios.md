@@ -21,7 +21,7 @@
 
 ## Quitar gasto
 
-![Quitargasto](Mockup/Quitar Gasto.JPG)
+![Quitargasto](Mockup/QuitarGasto.JPG)
 
 ## Menu de la aplicación
 
@@ -33,7 +33,7 @@
 
 ## Estadisticas de consumos
 
-![Estadisticasdeconsumos](Mockup/Estadisticas de consumos.JPG)
+![Estadisticasdeconsumos](Mockup/Estadisticasdeconsumos.JPG)
 
 ## Cambio de Contraseña
 
