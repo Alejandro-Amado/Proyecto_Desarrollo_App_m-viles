@@ -13,13 +13,26 @@
         android:theme="@style/Theme.AntSave"
         tools:targetApi="31">
         <activity
+            android:name=".Estadisticas_de_consumos"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".Eliminar_de_consumos"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".Anadir_gasto"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-
         <activity
             android:name=".Pagina_principal"
             android:exported="false">
