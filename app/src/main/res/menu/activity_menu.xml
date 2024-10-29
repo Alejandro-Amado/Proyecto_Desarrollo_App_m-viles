@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/menu"
+        android:title="Inicio" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/settings"
+        android:title="Configuración" />
+    <item
+        android:id="@+id/crear_catregoria"
+        android:icon="@drawable/crearcategoria"
+        android:title="Crear Categoria" />
+
+    <item
+        android:id="@+id/estadisticas_consumos"
+        android:icon="@drawable/estadisticas_consumos"
+        android:title="Estadisticas de tus consumos" />
+
+    <item
+        android:id="@+id/nav_about"
+        android:icon="@drawable/salir"
+        android:title="Salir" />
+</menu>
