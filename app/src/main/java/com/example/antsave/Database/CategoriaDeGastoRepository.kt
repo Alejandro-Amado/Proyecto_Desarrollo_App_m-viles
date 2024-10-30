@@ -1,7 +1,6 @@
 package com.example.antsave.Database
 
 import com.example.antsave.Categoria
-import com.example.antsave.Database.Categoria_de_gastoEntity
 
 class CategoriaDeGastoRepository(private val categoriaDeGastoDao: Categoria_de_gastoDao) {
 
