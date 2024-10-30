@@ -2,9 +2,11 @@ package com.example.antsave.Database.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.example.antsave.Database.UsuarioEntity
-import com.example.antsave.Database.Categoria_de_gastoEntity // Asegúrate de importar la entidad correcta
+import com.example.antsave.Database.Categoria_de_gastoEntity
+import java.time.LocalDate
 
 @Entity(
     tableName = "gasto",
@@ -21,6 +23,10 @@ import com.example.antsave.Database.Categoria_de_gastoEntity // Asegúrate de im
             childColumns = ["id_categoria"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["id_usuario"]),
+        Index(value = ["id_categoria"])
     ]
 )
 data class GastoEntity(
@@ -30,5 +36,5 @@ data class GastoEntity(
     val descripcion: String,
     val id_usuario: Int,
     val id_categoria: Int,
-    val fecha: String = ""
+    val fecha: String = LocalDate.now().toString()
 )

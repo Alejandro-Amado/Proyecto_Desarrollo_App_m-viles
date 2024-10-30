@@ -1,17 +1,16 @@
 package com.example.antsave
-
+import com.example.antsave.Database.AppDatabase
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.room.Room
+import com.example.antsave.Database.Categoria_de_gastoEntity
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
@@ -20,15 +19,27 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.example.antsave.databinding.ActivityEstadisticasDeConsumosBinding
 import com.github.mikephil.charting.components.Legend
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Estadisticas_de_consumos : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityEstadisticasDeConsumosBinding
     private lateinit var pieChart: PieChart
     private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var database: AppDatabase
+    private lateinit var Categorias: List<Categoria_de_gastoEntity>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        database = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "app_database"
+        ).build()
 
         binding = ActivityEstadisticasDeConsumosBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -41,7 +52,8 @@ class Estadisticas_de_consumos : AppCompatActivity(), NavigationView.OnNavigatio
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.navigationView.setNavigationItemSelectedListener(this)
         pieChart = findViewById(R.id.pieChart)
-        setupPieChart()
+        val idUsuario = 1
+        setupPieChart(idUsuario)
         setupSpinnergastos()
         val anadir = findViewById<Button>(R.id.regresar)
         anadir.setOnClickListener {
@@ -75,44 +87,65 @@ class Estadisticas_de_consumos : AppCompatActivity(), NavigationView.OnNavigatio
 
     private fun setupSpinnergastos() {
         val spinner: Spinner = findViewById(R.id.spinnerOpcionesgstos)
-        val opciones = arrayOf(
-            "Alquiler",
-            "Comida",
-            "Transporte",
-            "Servicios",
-            "Entretenimiento",
-            "Ropa",
-            "Salud",
-            "Educación"
-        )
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, opciones)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner.adapter = adapter
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Categorias = database.daocategoria.obtenerTodasLasCategorias()
+
+                withContext(Dispatchers.Main) {
+                    val adapter = ArrayAdapter(
+                        this@Estadisticas_de_consumos,
+                        android.R.layout.simple_spinner_item,
+                        Categorias.map { it.descripcion } // Mostrar solo las descripciones
+                    )
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    spinner.adapter = adapter
+                    spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(
+                            parent: AdapterView<*>,
+                            view: View?,
+                            position: Int,
+                            id: Long
+                        ) {
+                            val categoriaSeleccionada = Categorias[position]
+                            println("Categoría seleccionada: ${categoriaSeleccionada.descripcion}, ID: ${categoriaSeleccionada.id}")
+                        }
+
+                        override fun onNothingSelected(parent: AdapterView<*>) {
+                            // Lógica opcional si no se selecciona nada
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
-    private fun setupPieChart() {
 
-        val entries = ArrayList<PieEntry>()
-        entries.add(PieEntry(10f, "Alquiler"))
-        entries.add(PieEntry(30f, "Comida"))
-        entries.add(PieEntry(150f, "Transporte"))
-        entries.add(PieEntry(200f, "Servicios"))
-        entries.add(PieEntry(100f, "Entretenimiento"))
-        entries.add(PieEntry(75f, "Ropa"))
-        entries.add(PieEntry(50f, "Salud"))
-        entries.add(PieEntry(200f, "Educación"))
+    private fun setupPieChart(idUsuario: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val gastosPorCategoria = database.daogasto.obtenerGastosAgrupadosPorCategoria(idUsuario)
 
-        val dataSet = PieDataSet(entries, "Categorías de Gastos")
-        dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList() // Colores predeterminados
+                withContext(Dispatchers.Main) {
+                    val entries = ArrayList<PieEntry>()
+                    gastosPorCategoria.forEach { gasto ->
+                        entries.add(PieEntry(gasto.total.toFloat(), gasto.categoria))
+                    }
 
-        val pieData = PieData(dataSet)
-        pieChart.data = pieData
-        pieChart.setUsePercentValues(true) // Muestra los porcentajes si se desea
+                    val dataSet = PieDataSet(entries, "Categorías de Gastos")
+                    dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
 
+                    val pieData = PieData(dataSet)
+                    pieChart.data = pieData
+                    pieChart.setUsePercentValues(true) // Muestra los porcentajes
 
-        // Ajustar tamaño del gráfico
-        pieChart.layoutParams.height = 600 // Ajusta según sea necesario
-        pieChart.invalidate()
-
+                    pieChart.invalidate() // Refresca el gráfico
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
+
 }

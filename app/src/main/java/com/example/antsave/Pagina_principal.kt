@@ -1,58 +1,132 @@
 package com.example.antsave
 
-import android.content.Intent
+import MyValueFormatter
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import com.echo.holographlibrary.Bar
-import com.echo.holographlibrary.BarGraph
-import com.example.antsave.databinding.ActivityPaginaPrincipalBinding
+import androidx.room.Room
+import com.example.antsave.Database.AppDatabase
+import com.example.antsave.Database.Categoria_de_gastoEntity
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.navigation.NavigationView
+import com.example.antsave.databinding.ActivityPaginaPrincipalBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
     private lateinit var binding: ActivityPaginaPrincipalBinding
     private lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var database: AppDatabase
+    private lateinit var barChart: BarChart
+    private lateinit var categorias: List<Categoria_de_gastoEntity>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Inflate el binding para conectar la vista
+
         binding = ActivityPaginaPrincipalBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configurar DrawerLayout y ActionBarToggle
+
+        database = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "app_database"
+        ).build()
+
         toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, R.string.open_drawer, R.string.close_drawer
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-
         binding.navigationView.setNavigationItemSelectedListener(this)
 
-
-        binding.espacioGastoMensual.text = "Gasto Mensual: 500000"
-        binding.espacioGastoSemanal.text = "Gasto Semanal: 120000"
-        binding.espacioGastoDiario.text = "Gasto Diario: 300000"
-
-
-        binding.botonanadirgasto.setOnClickListener {
-            val intent = Intent(this, Anadir_gasto::class.java)
-            startActivity(intent)
-        }
-
-
-        val puntos = ArrayList<Bar>()
-        graficar_diagrama_barras(puntos)
+        barChart = binding.barChart
+        setupBarChart()
     }
+
+    private fun setupBarChart() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val gastosPorCategoria = database.daogasto.obtenerGastosAgrupadosPorCategoria(1)
+
+                val entries = ArrayList<BarEntry>()
+                val labels = ArrayList<String>()
+
+                gastosPorCategoria.forEachIndexed { index, gasto ->
+                    entries.add(BarEntry(index.toFloat(), gasto.total.toFloat()))
+                    labels.add(gasto.categoria)
+                }
+
+                val dataSet = BarDataSet(entries, "Gastos por Categoría")
+                dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
+                val barData = BarData(dataSet)
+                runOnUiThread {
+                    barChart.data = barData
+                    barChart.invalidate()
+                    barChart.xAxis.valueFormatter = MyValueFormatter(labels)
+                    barChart.xAxis.granularity = 1f
+
+
+                    binding.contenedorLeyendas.removeAllViews()
+                    labels.forEachIndexed { index, label ->
+
+                        val legendLayout = LinearLayout(this@Pagina_principal).apply {
+                            orientation = LinearLayout.HORIZONTAL
+                            gravity = Gravity.CENTER_VERTICAL
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            )
+                        }
+
+
+                        val colorBox = View(this@Pagina_principal).apply {
+                            setBackgroundColor(dataSet.colors[index % dataSet.colors.size])
+                            layoutParams = LinearLayout.LayoutParams(20, 20)
+                        }
+
+
+                        val legendText = TextView(this@Pagina_principal).apply {
+                            text = "$label: ${gastosPorCategoria[index].total}"
+                            setTextColor(Color.BLACK)
+                            textSize = 16f
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            ).apply {
+                                marginStart = 8
+                            }
+                        }
+
+
+                        legendLayout.addView(colorBox)
+                        legendLayout.addView(legendText)
+
+
+                        binding.contenedorLeyendas.addView(legendLayout)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -60,85 +134,8 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
         else super.onOptionsItemSelected(item)
     }
 
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_home -> {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
-            R.id.nav_about -> {
-                finishAffinity()
-            }
-            R.id.estadisticas_consumos -> {
-                val intent = Intent(this, Estadisticas_de_consumos::class.java)
-                startActivity(intent)
-                finish()
-            }
-        }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
-    }
-
-
-
-    private fun graficar_diagrama_barras(puntos: ArrayList<Bar>) {
-        val gastos = listOf("Alquiler", "Comida", "Transporte", "Servicios",
-            "Entretenimiento", "Ropa", "Salud", "Educación")
-        val costosGastos = listOf(10f, 30f, 150f, 200f, 100f, 75f, 50f, 200f)
-
-        val contenedorLeyendas = binding.contenedorLeyendas
-        contenedorLeyendas.removeAllViews()
-
-        for (i in gastos.indices) {
-            val colorBarra = Color.parseColor(generar_color_hex())
-            val barra = Bar().apply {
-                name = " "
-                value = costosGastos[i]
-                color = colorBarra
-            }
-            puntos.add(barra)
-
-
-            val leyendaView = crearLeyendaView(gastos[i], colorBarra)
-            contenedorLeyendas.addView(leyendaView)
-        }
-
-        binding.graphBar.bars = puntos
-    }
-
-
-    private fun crearLeyendaView(texto: String, color: Int): LinearLayout {
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(8, 8, 8, 8) }
-        }
-
-        val colorView = View(this).apply {
-            layoutParams = LinearLayout.LayoutParams(50, 50).apply {
-                setMargins(8, 0, 16, 0)
-            }
-            setBackgroundColor(color)
-        }
-
-        val textView = TextView(this).apply {
-            text = texto
-            textSize = 18f
-            setTextColor(Color.BLACK)
-        }
-
-        layout.addView(colorView)
-        layout.addView(textView)
-        return layout
-    }
-
-
-    private fun generar_color_hex(): String {
-        val hexChars = "0123456789ABCDEF"
-        return "#" + (1..6).map { hexChars.random() }.joinToString("")
     }
 }
