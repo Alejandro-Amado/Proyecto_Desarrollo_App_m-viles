@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import com.example.antsave.Database.UsuarioDao
@@ -23,7 +24,6 @@ class inicio_de_sesion : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_inicio_de_sesion)
 
-        // Inicializar Room Database
         val database = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "app_database"
@@ -32,13 +32,15 @@ class inicio_de_sesion : AppCompatActivity() {
         usuarioDao = database.daousuario
         repository = UsuarioRepository(usuarioDao)
 
-        // Encuentra los EditTexts y botones
-        val espacioCuenta = findViewById<EditText>(R.id.espacio_cuenta) // Asegúrate de que este EditText esté en el XML
-        val recuadroContrasena = findViewById<EditText>(R.id.recuadro_contrasena) // Asegúrate de que este EditText esté en el XML
+
+        val espacioCuenta =
+            findViewById<EditText>(R.id.espacio_cuenta)
+        val recuadroContrasena =
+            findViewById<EditText>(R.id.recuadro_contrasena)
         val button = findViewById<Button>(R.id.iniciosesion)
         val buttonsalir = findViewById<Button>(R.id.button2)
 
-        // Configurar el botón de iniciar sesión
+
         button.setOnClickListener {
             val correo = espacioCuenta.text.toString()
             val contrasena = recuadroContrasena.text.toString()
@@ -46,12 +48,12 @@ class inicio_de_sesion : AppCompatActivity() {
             if (correo.isNotEmpty() && contrasena.isNotEmpty()) {
                 verificarUsuario(correo, contrasena)
             } else {
-                // Mostrar mensaje de error si los campos están vacíos
-                // Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
+
+               Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Configurar el botón de salir
+
         buttonsalir.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -61,19 +63,30 @@ class inicio_de_sesion : AppCompatActivity() {
     private fun verificarUsuario(correo: String, contrasena: String) {
         CoroutineScope(Dispatchers.IO).launch {
             val usuarios = repository.getUsers()
-            val usuarioEncontrado = usuarios.find { it.correo == correo && it.contrasena == contrasena }
+            val usuarioEncontrado =
+                usuarios.find { it.correo == correo && it.contrasena == contrasena }
 
             withContext(Dispatchers.Main) {
                 if (usuarioEncontrado != null) {
-                    // Credenciales correctas, navegar a la página principal
+
+                    guardarIdUsuario(
+                        usuarioEncontrado.id ?: 0
+                    )
                     val intent = Intent(this@inicio_de_sesion, Pagina_principal::class.java)
                     startActivity(intent)
-                    finish() // Cerrar esta actividad
+
                 } else {
-                    // Mostrar mensaje de error si las credenciales son incorrectas
-                    // Toast.makeText(this@inicio_de_sesion, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+
+                    Toast.makeText(this@inicio_de_sesion, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+    }
+
+    private fun guardarIdUsuario(id: Int) {
+        val sharedPreferences = getSharedPreferences("AntSavePrefs", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putInt("userId", id)
+        editor.apply()
     }
 }

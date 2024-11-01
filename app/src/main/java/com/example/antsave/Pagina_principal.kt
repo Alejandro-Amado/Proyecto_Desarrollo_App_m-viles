@@ -1,6 +1,7 @@
 package com.example.antsave
 
 import MyValueFormatter
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -36,10 +37,18 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityPaginaPrincipalBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        val idusuario: Int = obtenerIdUsuario()
+        if (idusuario == -1) {
+
+            val intent = Intent(this, inicio_de_sesion::class.java)
+            startActivity(intent)
+
+            return
+        }
 
         database = Room.databaseBuilder(
             applicationContext,
@@ -56,13 +65,18 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
         binding.navigationView.setNavigationItemSelectedListener(this)
 
         barChart = binding.barChart
-        setupBarChart()
+        setupBarChart(idusuario)
     }
 
-    private fun setupBarChart() {
+    private fun obtenerIdUsuario(): Int {
+        val sharedPreferences = getSharedPreferences("AntSavePrefs", MODE_PRIVATE)
+        return sharedPreferences.getInt("userId", -1)
+    }
+
+    private fun setupBarChart(iduser:Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val gastosPorCategoria = database.daogasto.obtenerGastosAgrupadosPorCategoria(1)
+                val gastosPorCategoria = database.daogasto.obtenerGastosAgrupadosPorCategoria(iduser)
 
                 val entries = ArrayList<BarEntry>()
                 val labels = ArrayList<String>()
@@ -135,7 +149,23 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_home -> {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+            R.id.nav_about -> {
+                finishAffinity()
+            }
+            R.id.estadisticas_consumos -> {
+                val intent = Intent(this, Estadisticas_de_consumos::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
+
 }
