@@ -32,5 +32,16 @@ interface GastoDao {
     suspend fun obtenerGastosAgrupadosPorCategoria(idUsuario: Int): List<GastoPorCategoria>
 
 
+        @Query("SELECT * FROM gasto WHERE id_categoria= :categoriaId AND fecha >= date('now', 'start of day')")
+        suspend fun obtenerGastosDiariosPorCategoria(categoriaId: Int): List<GastoEntity>
+
+        @Query("SELECT * FROM gasto WHERE id_categoria= :categoriaId AND fecha >= date('now', '-7 days')")
+        suspend fun obtenerGastosSemanalesPorCategoria(categoriaId: Int): List<GastoEntity>
+
+        @Query("SELECT * FROM gasto WHERE id_categoria = :categoriaId AND fecha >= date('now', 'start of month')")
+        suspend fun obtenerGastosMensualesPorCategoria(categoriaId: Int): List<GastoEntity>
+
+
+
 
 }

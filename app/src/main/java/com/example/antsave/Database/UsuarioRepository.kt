@@ -7,12 +7,11 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
 
     suspend fun getUsers(): List<Usuario> {
         val entities = usuarioDao.getusers()
-        return entities.map { Usuario(correo = it.correo, contrasena = it.contrasena) }
+        return entities.map { Usuario(id = it.id, correo = it.correo, contrasena = it.contrasena) }
     }
 
-    suspend fun insertUser(user: Usuario) {
-        val entity = UsuarioEntity(correo = user.correo, contrasena = user.contrasena)
-        usuarioDao.insertuser(entity)
+    suspend fun insertUser(usuario: UsuarioEntity) {
+        usuarioDao.insertuser(usuario)
     }
     suspend fun crearUsuarioPredeterminado() {
         try {

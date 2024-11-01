@@ -14,7 +14,7 @@ class ModifBase(
 ) {
 
 
-    fun guardarUsuario(usuario: Usuario) {
+    fun guardarUsuario(usuario: UsuarioEntity) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 usuarioRepository.insertUser(usuario)
