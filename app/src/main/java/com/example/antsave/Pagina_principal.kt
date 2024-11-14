@@ -66,6 +66,7 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
 
         barChart = binding.barChart
         setupBarChart(idusuario)
+        setupTotalGastos(idusuario)
     }
 
     private fun obtenerIdUsuario(): Int {
@@ -147,6 +148,26 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
         return if (toggle.onOptionsItemSelected(item)) true
         else super.onOptionsItemSelected(item)
     }
+
+
+    private fun setupTotalGastos(idUsuario: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val totalDiario = database.daogasto.obtenerTotalGastosDiarios(idUsuario)
+                val totalSemanal = database.daogasto.obtenerTotalGastosSemanales(idUsuario)
+                val totalMensual = database.daogasto.obtenerTotalGastosMensuales(idUsuario)
+
+                withContext(Dispatchers.Main) {
+                    binding.espacioGastoDiario.text = "Gasto Diario: $totalDiario"
+                    binding.espacioGastoSemanal.text = "Gasto Semanal: $totalSemanal"
+                    binding.espacioGastoMensual.text = "Gasto Mensual: $totalMensual"
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
