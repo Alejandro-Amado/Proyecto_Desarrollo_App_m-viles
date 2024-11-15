@@ -40,13 +40,10 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
         binding = ActivityPaginaPrincipalBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         val idusuario: Int = obtenerIdUsuario()
         if (idusuario == -1) {
-
             val intent = Intent(this, inicio_de_sesion::class.java)
             startActivity(intent)
-
             return
         }
 
@@ -66,6 +63,19 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
 
         barChart = binding.barChart
         setupBarChart(idusuario)
+        setupTotalGastos(idusuario)
+
+
+        binding.botonanadirgasto.setOnClickListener {
+            val intent = Intent(this, Anadir_gasto::class.java)
+            startActivity(intent)
+        }
+
+        // Configurar el botón "Eliminar Gasto"
+        binding.botonquitargasto.setOnClickListener {
+            // Lógica para eliminar un gasto, si fuera necesario
+            // Este ejemplo no tiene la implementación para quitar gastos, pero puedes añadirla aquí
+        }
     }
 
     private fun obtenerIdUsuario(): Int {
@@ -73,7 +83,7 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
         return sharedPreferences.getInt("userId", -1)
     }
 
-    private fun setupBarChart(iduser:Int) {
+    private fun setupBarChart(iduser: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val gastosPorCategoria = database.daogasto.obtenerGastosAgrupadosPorCategoria(iduser)
@@ -95,7 +105,6 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
                     barChart.xAxis.valueFormatter = MyValueFormatter(labels)
                     barChart.xAxis.granularity = 1f
 
-
                     binding.contenedorLeyendas.removeAllViews()
                     labels.forEachIndexed { index, label ->
 
@@ -108,12 +117,10 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
                             )
                         }
 
-
                         val colorBox = View(this@Pagina_principal).apply {
                             setBackgroundColor(dataSet.colors[index % dataSet.colors.size])
                             layoutParams = LinearLayout.LayoutParams(20, 20)
                         }
-
 
                         val legendText = TextView(this@Pagina_principal).apply {
                             text = "$label: ${gastosPorCategoria[index].total}"
@@ -127,10 +134,8 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
                             }
                         }
 
-
                         legendLayout.addView(colorBox)
                         legendLayout.addView(legendText)
-
 
                         binding.contenedorLeyendas.addView(legendLayout)
                     }
@@ -141,7 +146,23 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
         }
     }
 
+    private fun setupTotalGastos(idUsuario: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val totalDiario = database.daogasto.obtenerTotalGastosDiarios(idUsuario)
+                val totalSemanal = database.daogasto.obtenerTotalGastosSemanales(idUsuario)
+                val totalMensual = database.daogasto.obtenerTotalGastosMensuales(idUsuario)
 
+                withContext(Dispatchers.Main) {
+                    binding.espacioGastoDiario.text = "Gasto Diario: $totalDiario"
+                    binding.espacioGastoSemanal.text = "Gasto Semanal: $totalSemanal"
+                    binding.espacioGastoMensual.text = "Gasto Mensual: $totalMensual"
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (toggle.onOptionsItemSelected(item)) true
@@ -167,5 +188,4 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
     }
-
 }

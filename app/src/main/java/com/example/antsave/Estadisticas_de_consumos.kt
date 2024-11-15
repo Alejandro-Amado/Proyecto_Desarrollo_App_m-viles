@@ -151,10 +151,17 @@ class Estadisticas_de_consumos : AppCompatActivity(), NavigationView.OnNavigatio
                     val dataSet = PieDataSet(entries, "Categorías de Gastos").apply {
                         colors = ColorTemplate.COLORFUL_COLORS.toList()
                     }
-                    pieChart.data = PieData(dataSet).apply {
 
+
+                    pieChart.apply {
+                        data = PieData(dataSet)
+                        setUsePercentValues(true)
+                        isDrawHoleEnabled = false
+                        setHoleColor(Color.TRANSPARENT)
+                        setTransparentCircleAlpha(0)
+                        setCenterText("")
+                        invalidate()
                     }
-                    pieChart.invalidate()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -162,6 +169,7 @@ class Estadisticas_de_consumos : AppCompatActivity(), NavigationView.OnNavigatio
             }
         }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (toggle.onOptionsItemSelected(item)) true else super.onOptionsItemSelected(item)
