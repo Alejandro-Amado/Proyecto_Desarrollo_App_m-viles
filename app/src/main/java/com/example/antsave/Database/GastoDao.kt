@@ -13,6 +13,9 @@ interface GastoDao {
     @Insert
     suspend fun insertarGasto(gasto: GastoEntity)
 
+    @Query("DELETE FROM gasto WHERE id = :gastoId")
+    suspend fun eliminarGasto(gastoId: Int)
+
     @Query("""
         INSERT INTO gasto (monto, descripcion, id_usuario, fecha)
         VALUES (:monto, :descripcion, :idUsuario, datetime('now'))

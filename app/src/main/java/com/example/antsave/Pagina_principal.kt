@@ -71,10 +71,9 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
             startActivity(intent)
         }
 
-        // Configurar el botón "Eliminar Gasto"
         binding.botonquitargasto.setOnClickListener {
-            // Lógica para eliminar un gasto, si fuera necesario
-            // Este ejemplo no tiene la implementación para quitar gastos, pero puedes añadirla aquí
+            val intent = Intent(this, Eliminar_de_consumos::class.java)
+            startActivity(intent)
         }
     }
 

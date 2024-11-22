@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:elevation="4dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <!-- Contenedor de los detalles del gasto -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Descripción del gasto -->
+            <TextView
+                android:id="@+id/descripcion_gasto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Descripción del gasto"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- Monto del gasto -->
+            <TextView
+                android:id="@+id/monto_gasto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$100.00"
+                android:textSize="14sp" />
+
+            <!-- Fecha del gasto -->
+            <TextView
+                android:id="@+id/fecha_gasto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="01/01/2024"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/btnEliminarGasto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/salir"
+        android:contentDescription="Eliminar gasto"
+        android:layout_gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
