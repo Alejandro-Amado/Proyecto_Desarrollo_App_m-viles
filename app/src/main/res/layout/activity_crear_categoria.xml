@@ -5,8 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Anadir_gasto">
-
+    tools:context=".Crear_Categoria">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -24,22 +23,23 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.1" />
 
+
         <View
-            android:id="@+id/fondo_recuadro_formulario"
+            android:id="@+id/fondo_recuadro_formulario_categoria"
             android:layout_width="311dp"
             android:layout_height="56dp"
             android:background="@color/black"
-            app:layout_constraintTop_toTopOf="@+id/espacionombredelgasto"
+            app:layout_constraintTop_toTopOf="@+id/espacionombrecategoria"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
         <EditText
-            android:id="@+id/espacionombredelgasto"
+            android:id="@+id/espacionombrecategoria"
             android:layout_width="310dp"
             android:layout_height="55dp"
             android:layout_marginTop="126dp"
             android:background="@color/white"
-            android:hint="Nombre del Gasto"
+            android:hint="Nombre de la Categoría"
             android:textSize="22sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -48,67 +48,20 @@
             app:layout_constraintTop_toTopOf="@+id/Logo_AntSave"
             app:layout_constraintVertical_bias="0.2" />
 
-        <TextView
-            android:id="@+id/txtCategoriaGasto"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="35dp"
-            android:text="Categoría de gasto"
-            android:textColor="#000000"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/spinnerOpciones"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            android:gravity="center_horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/espacionombredelgasto" />
-
-        <Spinner
-            android:id="@+id/spinnerOpciones"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:background="@color/white"
-            app:layout_constraintTop_toBottomOf="@+id/txtCategoriaGasto" />
-
-        <View
-            android:id="@+id/fondo_recuadro_formulario_Dinero"
-            android:layout_width="311dp"
-            android:layout_height="56dp"
-            android:background="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/espaciodinerogastado"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <EditText
-            android:id="@+id/espaciodinerogastado"
-            android:layout_width="310dp"
-            android:layout_height="55dp"
-            android:layout_marginTop="32dp"
-            android:hint="Dinero Gastado"
-            android:textSize="22sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerOpciones"
-            android:background="@color/white"
-            app:layout_constraintVertical_bias="0.05" />
 
         <Button
-            android:id="@+id/anadirgasto"
+            android:id="@+id/anadircategoria"
             android:layout_width="150dp"
             android:layout_height="55dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/rounded_buttons"
-            android:text="Añadir gasto"
+            android:text="Añadir Categoría"
             android:textColor="@color/white"
-            app:layout_constraintTop_toBottomOf="@+id/espaciodinerogastado"
-            app:layout_constraintEnd_toEndOf="@+id/atras" />
+            app:layout_constraintTop_toBottomOf="@+id/espacionombrecategoria"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.5" />
+
 
         <Button
             android:id="@+id/atras"
@@ -120,11 +73,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/anadirgasto"
+            app:layout_constraintTop_toBottomOf="@+id/anadircategoria"
             android:background="@drawable/rounded_buttons" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
@@ -132,5 +84,5 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:menu="@menu/activity_menu" />
-
 </androidx.drawerlayout.widget.DrawerLayout>
+

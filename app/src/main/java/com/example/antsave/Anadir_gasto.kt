@@ -44,10 +44,8 @@ class Anadir_gasto : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             "app_database"
         ).build()
 
-        // Set up the spinner with categories
         setupSpinner()
 
-        // Handle "Add expense" button click
         binding.anadirgasto.setOnClickListener {
             agregarGasto()
         }

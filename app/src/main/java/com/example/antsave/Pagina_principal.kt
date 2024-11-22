@@ -183,6 +183,11 @@ class Pagina_principal : AppCompatActivity(), NavigationView.OnNavigationItemSel
                 startActivity(intent)
                 finish()
             }
+            R.id.crear_catregoria -> {
+                val intent = Intent(this, Crear_Categoria::class.java)
+                startActivity(intent)
+                finish()
+            }
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
